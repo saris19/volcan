@@ -1,0 +1,25 @@
+{
+  "name": "galeras-backend",
+  "version": "1.0.0",
+  "description": "Microservicios gRPC del sistema de alerta temprana volcánica Galeras",
+  "type": "module",
+  "main": "src/main.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/main.js",
+    "start:risk-zones": "SERVICE=risk-zones PORT=50055 node src/main.js",
+    "start:alerts": "SERVICE=alerts PORT=50054 node src/main.js",
+    "start:analysis": "SERVICE=analysis PORT=50053 ALERTS_ADDR=localhost:50054 node src/main.js",
+    "start:ingestion": "SERVICE=ingestion PORT=50052 ANALYSIS_ADDR=localhost:50053 node src/main.js",
+    "start:simulator": "SERVICE=simulator PORT=50051 INGESTION_ADDR=localhost:50052 node src/main.js",
+    "smoke-test": "node scripts/smoke-test.js",
+    "dev": "node scripts/run-all.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.6",
+    "@grpc/proto-loader": "^0.7.15"
+  }
+}

@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package galeras.v1;
+
+import "galeras/v1/common.proto";
+
+// Servicio de zonas de riesgo: devuelve zonas, puntos de encuentro y recomendaciones.
+service RiskZoneService {
+  // UNARIA
+  rpc GetRiskZones(GetRiskZonesRequest) returns (GetRiskZonesResponse);
+}
+
+enum HazardLevel {
+  HAZARD_LEVEL_UNSPECIFIED = 0;
+  HAZARD_LEVEL_HIGH = 1;
+  HAZARD_LEVEL_MEDIUM = 2;
+  HAZARD_LEVEL_LOW = 3;
+}
+
+message RiskZone {
+  string id = 1;
+  string name = 2;
+  HazardLevel hazard = 3;
+  GeoPoint center = 4;
+  double radius_km = 5;
+  repeated string localities = 6;
+  bool evacuate = 7; // ¿Se debe evacuar con el nivel de alerta solicitado?
+}
+
+message ShelterPoint {
+  string id = 1;
+  string name = 2;
+  GeoPoint location = 3;
+  int32 capacity = 4;
+}
+
+message GetRiskZonesRequest {
+  AlertLevel level = 1;
+}
+
+message GetRiskZonesResponse {
+  repeated RiskZone zones = 1;
+  repeated ShelterPoint shelters = 2;
+  repeated string recommendations = 3;
+}

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package galeras.v1;
+
+import "galeras/v1/common.proto";
+
+// Servicio de análisis: clasifica cada ventana de señal con el método STA/LTA.
+service AnalysisService {
+  // BIDIRECCIONAL: ingesta envía ventanas y recibe su clasificación
+  // sobre la misma conexión HTTP/2, sin esperar una respuesta por cada envío.
+  rpc AnalyzeStream(stream SignalWindow) returns (stream WindowClassification);
+
+  // UNARIA: analiza una sola ventana (útil para pruebas).
+  rpc AnalyzeWindow(SignalWindow) returns (WindowClassification);
+}
+
+message WindowClassification {
+  string station_id = 1;
+  int64 start_time_ms = 2;
+  double sta_lta_ratio = 3;      // Relación promedio corto / promedio largo
+  double peak_amplitude = 4;
+  double dominant_frequency_hz = 5;
+  AlertLevel level = 6;
+  EventType event_type = 7;
+  bool is_event = 8;
+}

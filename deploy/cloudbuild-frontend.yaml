@@ -1,0 +1,11 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - "build"
+      - "--build-arg"
+      - "VITE_API_URL=${_VITE_API_URL}"
+      - "-t"
+      - "${_REGISTRY}/frontend:${_TAG}"
+      - "frontend"
+images:
+  - "${_REGISTRY}/frontend:${_TAG}"

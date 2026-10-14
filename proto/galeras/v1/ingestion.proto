@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package galeras.v1;
+
+import "galeras/v1/common.proto";
+
+// Servicio de ingesta: recibe las lecturas crudas de las estaciones,
+// las agrupa en ventanas y las reenvía al servicio de análisis.
+service IngestionService {
+  // CLIENT STREAMING: el simulador envía un flujo continuo de lecturas
+  // y recibe un resumen cuando cierra el stream.
+  rpc StreamReadings(stream SensorReading) returns (IngestionSummary);
+
+  // SERVER STREAMING: el frontend recibe la señal sísmica en vivo.
+  rpc WatchSignal(WatchSignalRequest) returns (stream SignalWindow);
+
+  // UNARIA: lista de estaciones registradas.
+  rpc ListStations(ListStationsRequest) returns (ListStationsResponse);
+}
+
+// Paquete de muestras de una estación (≈ 0,2 s de señal).
+message SensorReading {
+  string station_id = 1;
+  int64 timestamp_ms = 2;
+  int32 sample_rate_hz = 3;
+  repeated float samples = 4;
+}
+
+message IngestionSummary {
+  int64 readings_received = 1;
+  int64 windows_forwarded = 2;
+}
+
+message WatchSignalRequest {
+  // Vacío = todas las estaciones.
+  repeated string station_ids = 1;
+}
+
+message ListStationsRequest {}
+
+message ListStationsResponse {
+  repeated Station stations = 1;
+}

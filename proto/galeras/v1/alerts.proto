@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package galeras.v1;
+
+import "galeras/v1/common.proto";
+
+// Servicio de alertas: guarda los eventos y calcula el nivel de alerta global.
+service AlertService {
+  // UNARIA: el servicio de análisis reporta un evento detectado.
+  rpc ReportEvent(SeismicEvent) returns (ReportEventResponse);
+
+  // SERVER STREAMING: el frontend recibe el nivel de alerta y los eventos en vivo.
+  rpc SubscribeAlerts(SubscribeAlertsRequest) returns (stream AlertUpdate);
+
+  // UNARIA: historial de eventos recientes.
+  rpc ListRecentEvents(ListRecentEventsRequest) returns (ListRecentEventsResponse);
+}
+
+message SeismicEvent {
+  string id = 1;
+  string station_id = 2;
+  int64 detected_at_ms = 3;
+  EventType event_type = 4;
+  AlertLevel level = 5;
+  double sta_lta_ratio = 6;
+  double peak_amplitude = 7;
+  double dominant_frequency_hz = 8;
+}
+
+message ReportEventResponse {
+  string event_id = 1;
+  AlertLevel current_level = 2;
+}
+
+message SubscribeAlertsRequest {}
+
+message AlertUpdate {
+  AlertLevel current_level = 1;
+  int64 updated_at_ms = 2;
+  SeismicEvent event = 3;            // Vacío en los mensajes de estado periódicos
+  int32 events_last_window = 4;      // Eventos en la ventana de evaluación
+  string message = 5;                // Texto legible para la población
+}
+
+message ListRecentEventsRequest {
+  int32 limit = 1;
+}
+
+message ListRecentEventsResponse {
+  repeated SeismicEvent events = 1;
+}

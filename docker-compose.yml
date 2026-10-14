@@ -1,0 +1,68 @@
+# Entorno local completo: 5 microservicios + Envoy + frontend.
+#   docker compose up --build
+# Frontend: http://localhost:5173   ·   Envoy (gRPC-Web): http://localhost:8080
+x-backend: &backend
+  build:
+    context: .
+    dockerfile: backend/Dockerfile
+  image: galeras-backend
+  restart: unless-stopped
+
+services:
+  risk-zones:
+    <<: *backend
+    environment:
+      SERVICE: risk-zones
+      PORT: "8080"
+
+  alerts:
+    <<: *backend
+    environment:
+      SERVICE: alerts
+      PORT: "8080"
+
+  analysis:
+    <<: *backend
+    environment:
+      SERVICE: analysis
+      PORT: "8080"
+      ALERTS_ADDR: alerts:8080
+    depends_on: [alerts]
+
+  ingestion:
+    <<: *backend
+    environment:
+      SERVICE: ingestion
+      PORT: "8080"
+      ANALYSIS_ADDR: analysis:8080
+    depends_on: [analysis]
+
+  simulator:
+    <<: *backend
+    environment:
+      SERVICE: simulator
+      PORT: "8080"
+      INGESTION_ADDR: ingestion:8080
+    depends_on: [ingestion]
+
+  envoy:
+    build: ./envoy
+    environment:
+      LISTEN_PORT: "8080"
+      SIMULATOR_ADDR: simulator:8080
+      INGESTION_ADDR: ingestion:8080
+      ALERTS_ADDR: alerts:8080
+      RISK_ZONES_ADDR: risk-zones:8080
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    depends_on: [simulator, ingestion, alerts, risk-zones]
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8080
+    ports:
+      - "5173:8080"
+    depends_on: [envoy]

@@ -1,0 +1,21 @@
+# Blueprint de Render (plan gratuito).
+# Render -> New -> Blueprint -> seleccionar este repositorio.
+services:
+  - type: web
+    name: galeras-grpc
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./render/Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: commit
+    envVars:
+      # Cámbielo por la URL de Vercel (p. ej. https://galeras-grpc.vercel.app) cuando la tenga.
+      - key: ALLOWED_ORIGIN
+        value: "*"
+      - key: ENVOY_LOG_LEVEL
+        value: warn
+      # Eventos sísmicos leves aleatorios de fondo (true/false)
+      - key: SPONTANEOUS_EVENTS
+        value: "true"

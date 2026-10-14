@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package galeras.v1;
+
+import "galeras/v1/common.proto";
+
+// Control del simulador de estaciones (para la demo).
+service SimulatorControlService {
+  // UNARIA: dispara un evento sísmico simulado desde el frontend.
+  rpc TriggerEvent(TriggerEventRequest) returns (TriggerEventResponse);
+}
+
+message TriggerEventRequest {
+  EventType event_type = 1;
+  double intensity = 2; // 1 (leve) a 10 (muy fuerte)
+}
+
+message TriggerEventResponse {
+  bool accepted = 1;
+  string message = 2;
+}

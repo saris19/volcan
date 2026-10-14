@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package galeras.v1;
+
+// Niveles de alerta volcánica (escala por colores usada en Colombia).
+enum AlertLevel {
+  ALERT_LEVEL_UNSPECIFIED = 0;
+  ALERT_LEVEL_GREEN = 1;   // Volcán activo, comportamiento estable
+  ALERT_LEVEL_YELLOW = 2;  // Cambios en la actividad
+  ALERT_LEVEL_ORANGE = 3;  // Posible erupción en días o semanas
+  ALERT_LEVEL_RED = 4;     // Erupción inminente o en curso
+}
+
+// Tipo de evento sísmico detectado.
+enum EventType {
+  EVENT_TYPE_UNSPECIFIED = 0;
+  EVENT_TYPE_VOLCANO_TECTONIC = 1; // VT: fractura de roca, alta frecuencia
+  EVENT_TYPE_LONG_PERIOD = 2;      // LP: movimiento de fluidos, baja frecuencia
+  EVENT_TYPE_TREMOR = 3;           // Tremor: vibración sostenida
+}
+
+message GeoPoint {
+  double latitude = 1;
+  double longitude = 2;
+}
+
+message Station {
+  string id = 1;
+  string name = 2;
+  GeoPoint location = 3;
+  double distance_to_crater_km = 4;
+}
+
+// Ventana de señal de una estación (unidad que viaja entre ingesta y análisis).
+message SignalWindow {
+  string station_id = 1;
+  int64 start_time_ms = 2;
+  int32 sample_rate_hz = 3;
+  repeated float samples = 4;
+}

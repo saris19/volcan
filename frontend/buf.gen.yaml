@@ -1,0 +1,6 @@
+# Genera el código TypeScript (mensajes + descriptores de servicio) desde ../proto
+version: v2
+plugins:
+  - local: protoc-gen-es
+    out: src/gen
+    opt: target=ts
